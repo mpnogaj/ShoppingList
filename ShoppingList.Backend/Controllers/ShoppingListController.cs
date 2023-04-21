@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ShoppingList.Backend.Db;
@@ -18,6 +19,7 @@ public class ShoppingListController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize]
     public async Task<ActionResult<IEnumerable<ShoppingListDTO>>> GetShoppingLists()
     {
         return await _db.ShoppingLists

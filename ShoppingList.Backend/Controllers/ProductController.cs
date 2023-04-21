@@ -18,6 +18,7 @@ public class ProductController : ControllerBase
     }
 
     [HttpGet]
+    [Route("products")]
     public async Task<ActionResult<IEnumerable<ProductDTO>>> GetProducts()
     {
         return await _db.Products.Select(x => new ProductDTO
