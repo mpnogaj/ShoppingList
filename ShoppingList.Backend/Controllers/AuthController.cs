@@ -14,13 +14,15 @@ public class AuthController : ControllerBase
 	private readonly TokenService _tokenService;
 	private readonly IdentityUserDbContext _userDb;
 	private readonly UserManager<IdentityUser> _userManager;
+	private readonly IConfiguration _configuration;
 
 	public AuthController(UserManager<IdentityUser> userManager, IdentityUserDbContext userDb,
-		TokenService tokenService)
+		TokenService tokenService, IConfiguration configuration)
 	{
 		_userManager = userManager;
 		_userDb = userDb;
 		_tokenService = tokenService;
+		_configuration = configuration;
 	}
 
 	[HttpPost]
@@ -52,11 +54,23 @@ public class AuthController : ControllerBase
 		if (userInDb == null)
 			return Unauthorized();
 
-		var token = _tokenService.CreateToken(userInDb);
+		string token = _tokenService.CreateToken(userInDb);
 
 		await _userDb.SaveChangesAsync();
 
+		string? cookieName = _configuration["JwtSettings:TokenCookieName"];
 		
+		if(cookieName == null)
+			throw new NullReferenceException(nameof(cookieName));
+		
+		HttpContext.Response.Cookies.Append(cookieName, token, new CookieOptions
+		{
+			Expires = TokenService.GetExpirationTime(),
+			HttpOnly = true,
+			Secure = true,
+			IsEssential = true,
+			SameSite = SameSiteMode.None
+		});
 
 		return Ok(token);
 	}

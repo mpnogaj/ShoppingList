@@ -72,8 +72,7 @@ class LoginComponent<T> extends React.Component<T, ICompState> {
     };
 
     try {
-      const resp = await axios.get<string>(AuthenticateEndpoint, { params: payload });
-      window.alert(resp.data);
+      await axios.get<string>(AuthenticateEndpoint, { params: payload });
     } catch (ex) {
       if (ex instanceof AxiosError) {
         console.log(ex);

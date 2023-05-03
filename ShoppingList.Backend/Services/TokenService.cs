@@ -9,7 +9,7 @@ namespace ShoppingList.Backend.Services;
 
 public class TokenService
 {
-	private const int ExpirationMinutes = 30;
+	private static readonly TimeSpan ExpirationTime = TimeSpan.FromMinutes(30); 
 	private readonly IConfiguration _configuration;
 
 	public TokenService(IConfiguration configuration)
@@ -26,15 +26,17 @@ public class TokenService
 
 	private JwtSecurityToken CreateJwt(IEnumerable<Claim> claims, SigningCredentials credentials)
 	{
-		var issuer = _configuration["JwtSettings:Issuer"];
-		var audience = _configuration["JwtSettings:Audience"];
+		string? issuer = _configuration["JwtSettings:Issuer"];
+		string? audience = _configuration["JwtSettings:Audience"];
 
 		if (issuer == null || audience == null)
-			throw new ArgumentNullException(issuer == null ? nameof(issuer) : nameof(audience));
+			throw new NullReferenceException(issuer == null ? nameof(issuer) : nameof(audience));
 
 		return new JwtSecurityToken(issuer, audience, claims, signingCredentials: credentials,
-			expires: DateTime.Now.AddMinutes(ExpirationMinutes));
+			expires: GetExpirationTime());
 	}
+
+	public static DateTime GetExpirationTime() => DateTime.Now.Add(ExpirationTime);
 
 	private static IEnumerable<Claim> CreateClaims(IdentityUser user)
 	{
@@ -59,9 +61,9 @@ public class TokenService
 
 	private SigningCredentials CreateCredentials()
 	{
-		var key = _configuration["JwtSettings:SecretKey"];
+		string? key = _configuration["JwtSettings:SecretKey"];
 		if (key == null)
-			throw new ArgumentNullException(nameof(key));
+			throw new NullReferenceException(nameof(key));
 		var bytes = Encoding.UTF8.GetBytes(key).ToArray();
 		return new SigningCredentials(new SymmetricSecurityKey(bytes),
 			SecurityAlgorithms.HmacSha256);

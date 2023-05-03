@@ -60,29 +60,45 @@ builder.Services.AddSwaggerGen(options =>
 	});
 });
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
-{
-	var issuer = builder.Configuration["JwtSettings:Issuer"];
-	var audience = builder.Configuration["JwtSettings:Audience"];
-	var key = builder.Configuration["JwtSettings:SecretKey"];
+string? tokenCookieName = builder.Configuration["JwtSettings:TokenCookieName"];
 
-	if (key == null)
-		throw new ArgumentNullException(nameof(key));
+if (tokenCookieName == null)
+	throw new NullReferenceException(nameof(tokenCookieName));
 
-	options.TokenValidationParameters = new TokenValidationParameters
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+	.AddCookie(x => x.Cookie.Name = tokenCookieName)
+	.AddJwtBearer(options =>
 	{
-		ClockSkew = TimeSpan.Zero,
-		ValidateIssuer = true,
-		ValidateAudience = true,
-		ValidateLifetime = true,
-		ValidateIssuerSigningKey = true,
-		ValidIssuer = issuer ?? throw new ArgumentNullException(nameof(issuer)),
-		ValidAudience = audience ?? throw new ArgumentNullException(nameof(audience)),
-		IssuerSigningKey = new SymmetricSecurityKey(
-			Encoding.UTF8.GetBytes(key)
-		)
-	};
-});
+		string? issuer = builder.Configuration["JwtSettings:Issuer"];
+		string? audience = builder.Configuration["JwtSettings:Audience"];
+		string? key = builder.Configuration["JwtSettings:SecretKey"];
+
+		if (key == null)
+			throw new NullReferenceException(nameof(key));
+
+		options.SaveToken = true;
+		options.TokenValidationParameters = new TokenValidationParameters
+		{
+			ClockSkew = TimeSpan.Zero,
+			ValidateIssuer = true,
+			ValidateAudience = true,
+			ValidateLifetime = true,
+			ValidateIssuerSigningKey = true,
+			ValidIssuer = issuer ?? throw new NullReferenceException(nameof(issuer)),
+			ValidAudience = audience ?? throw new NullReferenceException(nameof(audience)),
+			IssuerSigningKey = new SymmetricSecurityKey(
+				Encoding.UTF8.GetBytes(key)
+			)
+		};
+		options.Events = new JwtBearerEvents()
+		{
+			OnMessageReceived = (ctx) =>
+			{
+				ctx.Token ??= ctx.Request.Cookies[tokenCookieName];
+				return Task.CompletedTask;
+			}
+		};
+	});
 
 builder.Services.AddIdentityCore<IdentityUser>(options =>
 {
