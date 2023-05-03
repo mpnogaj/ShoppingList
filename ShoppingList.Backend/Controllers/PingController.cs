@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace ShoppingList.Backend.Controllers;
 
 [ApiController]
-[Route("[controller]/[action]")]
+[Route("api/[controller]/[action]")]
 public class PingController : Controller
 {
 	[HttpGet]

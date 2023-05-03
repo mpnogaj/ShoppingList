@@ -8,7 +8,7 @@ using ShoppingList.Backend.Services;
 namespace ShoppingList.Backend.Controllers;
 
 [ApiController]
-[Route("[controller]/[action]")]
+[Route("api/[controller]/[action]")]
 public class AuthController : ControllerBase
 {
 	private readonly TokenService _tokenService;
@@ -55,6 +55,8 @@ public class AuthController : ControllerBase
 		var token = _tokenService.CreateToken(userInDb);
 
 		await _userDb.SaveChangesAsync();
+
+		
 
 		return Ok(token);
 	}

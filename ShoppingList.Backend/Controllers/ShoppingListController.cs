@@ -8,7 +8,7 @@ using ShoppingList.Backend.Models;
 namespace ShoppingList.Backend.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class ShoppingListController : ControllerBase
 {
 	private readonly ShoppingListDbContext _db;
