@@ -1,12 +1,13 @@
 import React from 'react';
 import './App.css';
 import LoginComponent from './Components/LoginComponent/LoginComponent'
+import { Container } from 'react-bootstrap';
 
 function App() {
   return (
-      <div className="container-fluid">
+      <Container fluid>
         <LoginComponent/>
-      </div>
+      </Container>
   );
 }
 
