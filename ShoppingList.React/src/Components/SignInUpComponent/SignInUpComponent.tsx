@@ -1,17 +1,22 @@
 import React from "react";
 import { Button, Col, Form, FormControl, FormFloating, Row } from "react-bootstrap";
 import axios, { AxiosError } from 'axios';
-import { AuthenticateEndpoint } from "../../Endpoints";
+import { AuthenticateEndpoint, RegisterEndpoint } from "../../Endpoints";
+import { NavComponent, NavComponentProps, navHOC } from "../NavComponent/NavComponen";
 
 interface ICompState {
   username: string,
   password: string,
   error: string,
-  singInBtnEnabled: boolean
+  singInBtnEnabled: boolean;
 }
 
-class LoginComponent<T> extends React.Component<T, ICompState> {
-  constructor(props: T) {
+interface ICompProps {
+  isSignIn: boolean;
+}
+
+class SignInUpComponent extends NavComponent<ICompProps, ICompState> {
+  constructor(props: NavComponentProps<ICompProps>) {
     super(props);
 
     this.state = {
@@ -28,7 +33,7 @@ class LoginComponent<T> extends React.Component<T, ICompState> {
         <Col md="6">
           <h2 className="display-2 text-center my-5">Shopping List</h2>
           <Form className="mb-4">
-            <h2>Sign in</h2>
+            <h2>{this.props.isSignIn ? "Sign in" : "Sing up"}</h2>
             <FormFloating className="mb-3">
               <FormControl type="text" id="floatingInput"
                 placeholder="Username" required={true} onChange={(event) => {
@@ -45,7 +50,7 @@ class LoginComponent<T> extends React.Component<T, ICompState> {
             </FormFloating>
 
             <Row>
-              <span className="error-text mb-2" style={{color: "red"}}>{this.state.error}</span>
+              <span className="error-text mb-2" style={{ color: "red" }}>{this.state.error}</span>
             </Row>
 
             <Row>
@@ -53,26 +58,35 @@ class LoginComponent<T> extends React.Component<T, ICompState> {
                 <Button variant="primary" className="p-2" type="submit" onClick={async (e) => {
                   e.preventDefault();
                   await this.signIn();
-                }} disabled={!this.state.singInBtnEnabled}>Sign in</Button>
+                }} disabled={!this.state.singInBtnEnabled}>{this.props.isSignIn ? "Sign in" : "Sing up"}</Button>
               </Col>
             </Row>
           </Form>
-          <span>Don't have an account? <a href="https://google.com">Sign up</a></span>
+          {this.props.isSignIn
+            ? <span>Don't have an account? <a href="/SignUp">Sign up</a></span> 
+            : <span>Already have an account? <a href="/SignIn">Sign in</a></span>}
+
         </Col>
       </Row>
     );
   }
 
   signIn = async () => {
-    this.setState({singInBtnEnabled: false});
+    this.setState({ singInBtnEnabled: false });
 
-    const payload: ILoginPayload = {
+    const payload = {
       username: this.state.username,
       password: this.state.password
     };
 
     try {
-      await axios.get<string>(AuthenticateEndpoint, { params: payload });
+      if(this.props.isSignIn) {
+        await axios.get<string>(AuthenticateEndpoint, { params: payload });
+        this.props.navigate('/');
+      } else {
+        await axios.post(RegisterEndpoint, payload);
+        this.props.navigate('/SignIn');
+      }
     } catch (ex) {
       if (ex instanceof AxiosError) {
         console.log(ex);
@@ -83,7 +97,7 @@ class LoginComponent<T> extends React.Component<T, ICompState> {
         }
       }
     }
-    this.setState({singInBtnEnabled: true});
+    this.setState({ singInBtnEnabled: true });
   }
 
   getErrorMessage = (errorCode: number): string | undefined => {
@@ -100,9 +114,4 @@ class LoginComponent<T> extends React.Component<T, ICompState> {
   }
 }
 
-interface ILoginPayload {
-  username: string,
-  password: string
-}
-
-export default LoginComponent;
+export default navHOC(SignInUpComponent);
