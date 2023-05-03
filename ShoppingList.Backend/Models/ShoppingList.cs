@@ -5,7 +5,7 @@ namespace ShoppingList.Backend.Models;
 [PrimaryKey(nameof(Id))]
 public class ShoppingList
 {
-    public int Id { get; set; }
-    public string Name { get; set; }
-    public List<Product> Products { get; set; }
+	public int Id { get; set; }
+	public string Name { get; set; }
+	public List<Product> Products { get; set; }
 }

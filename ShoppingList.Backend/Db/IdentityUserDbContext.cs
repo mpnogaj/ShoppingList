@@ -6,8 +6,7 @@ namespace ShoppingList.Backend.Db;
 
 public class IdentityUserDbContext : IdentityUserContext<IdentityUser>
 {
-    public IdentityUserDbContext(DbContextOptions<IdentityUserDbContext> options) : base(options)
-    {
-        
-    }
+	public IdentityUserDbContext(DbContextOptions<IdentityUserDbContext> options) : base(options)
+	{
+	}
 }
