@@ -45,7 +45,8 @@ public class ShoppingListController : ControllerBase
 	public async Task<ActionResult<ShoppingListDTO>> GetShoppingList(int id)
 	{
 		var shoppingList = await _db.ShoppingLists
-			.Include(x => x.Products).FirstOrDefaultAsync(x => x.Id == id);
+			.Include(x => x.Products)
+			.FirstOrDefaultAsync(x => x.Id == id);
 		if (shoppingList == null) return NotFound();
 
 		string userGuid = _userInfoService.GetUserGuid(HttpContext.User);
@@ -120,6 +121,23 @@ public class ShoppingListController : ControllerBase
 		shoppingList.Name = shoppingListDto.Name;
 		shoppingList.Products.Clear();
 		foreach (var product in productsOnList) shoppingList.Products.Add(product);
+		await _db.SaveChangesAsync();
+
+		return Ok();
+	}
+
+	[HttpDelete]
+	public async Task<IActionResult> Delete(int id)
+	{
+		var shoppingList = await _db.ShoppingLists
+			.Include(x => x.Products)
+			.FirstOrDefaultAsync(x => x.Id == id);
+		if (shoppingList == null) return NotFound();
+
+		string userGuid = _userInfoService.GetUserGuid(HttpContext.User);
+		if (shoppingList.UserGuid != userGuid) return Unauthorized();
+
+		_db.ShoppingLists.Remove(shoppingList);
 		await _db.SaveChangesAsync();
 
 		return Ok();

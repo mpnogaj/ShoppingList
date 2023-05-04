@@ -4,4 +4,5 @@ export const AuthenticateEndpoint = `${PREFIX}/Auth/Authenticate`;
 export const RegisterEndpoint = `${PREFIX}/Auth/Register`;
 export const LogoutEndpoint = `${PREFIX}/Auth/Logout`;
 export const AuthPingEndpoint = `${PREFIX}/Ping/AuthPing`;
-export const GetUserEndpoint = `${PREFIX}/User`;
+export const GetUserEndpoint = `${PREFIX}/Auth/GetLoggedUser`;
+export const GetListsEndpoint = `${PREFIX}/ShoppingList`;
