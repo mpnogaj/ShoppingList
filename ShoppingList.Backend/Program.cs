@@ -112,6 +112,7 @@ builder.Services.AddIdentityCore<IdentityUser>(options =>
 }).AddEntityFrameworkStores<IdentityUserDbContext>();
 
 builder.Services.AddScoped<TokenService, TokenService>();
+builder.Services.AddSingleton<UserInfoService, UserInfoService>();
 
 var app = builder.Build();
 

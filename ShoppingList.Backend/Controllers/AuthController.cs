@@ -1,8 +1,10 @@
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ShoppingList.Backend.Db;
+using ShoppingList.Backend.DTO;
 using ShoppingList.Backend.Services;
 
 namespace ShoppingList.Backend.Controllers;
@@ -14,15 +16,17 @@ public class AuthController : ControllerBase
 	private readonly TokenService _tokenService;
 	private readonly IdentityUserDbContext _userDb;
 	private readonly UserManager<IdentityUser> _userManager;
+	private readonly UserInfoService _userInfoService;
 	private readonly IConfiguration _configuration;
 
 	public AuthController(UserManager<IdentityUser> userManager, IdentityUserDbContext userDb,
-		TokenService tokenService, IConfiguration configuration)
+		TokenService tokenService, IConfiguration configuration, UserInfoService userInfoService)
 	{
 		_userManager = userManager;
 		_userDb = userDb;
 		_tokenService = tokenService;
 		_configuration = configuration;
+		_userInfoService = userInfoService;
 	}
 
 	[HttpPost]
@@ -73,6 +77,30 @@ public class AuthController : ControllerBase
 		});
 
 		return Ok(token);
+	}
+
+	[HttpPost]
+	public IActionResult Logout()
+	{
+		string? cookieName = _configuration["JwtSettings:TokenCookieName"];
+		
+		if(cookieName == null)
+			throw new NullReferenceException(nameof(cookieName));
+		
+		HttpContext.Response.Cookies.Delete(cookieName);
+		
+		return Ok();
+	}
+	
+	[HttpGet]
+	public ActionResult<UserDTO> GetLoggedUser()
+	{
+		var loggedUser = HttpContext.User;
+		return new UserDTO
+		{
+			UserGuid = _userInfoService.GetUserGuid(loggedUser),
+			UserName = _userInfoService.GetUserName(loggedUser)
+		};
 	}
 }
 

@@ -3,6 +3,7 @@ import { Button, Col, Form, FormControl, FormFloating, Row } from "react-bootstr
 import axios, { AxiosError } from 'axios';
 import { AuthenticateEndpoint, RegisterEndpoint } from "../../Endpoints";
 import { NavComponent, NavComponentProps, navHOC } from "../NavComponent/NavComponen";
+import AppHeaderComponent from "../AppHeaderComponent/AppHeaderComponent";
 
 interface ICompState {
   username: string,
@@ -31,7 +32,7 @@ class SignInUpComponent extends NavComponent<ICompProps, ICompState> {
     return (
       <Row className="justify-content-center">
         <Col md="6">
-          <h2 className="display-2 text-center my-5">Shopping List</h2>
+          <AppHeaderComponent/>
           <Form className="mb-4">
             <h2>{this.props.isSignIn ? "Sign in" : "Sing up"}</h2>
             <FormFloating className="mb-3">

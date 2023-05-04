@@ -4,26 +4,31 @@ using Microsoft.EntityFrameworkCore;
 using ShoppingList.Backend.Db;
 using ShoppingList.Backend.DTO;
 using ShoppingList.Backend.Models;
+using ShoppingList.Backend.Services;
 
 namespace ShoppingList.Backend.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class ShoppingListController : ControllerBase
 {
 	private readonly ShoppingListDbContext _db;
+	private readonly UserInfoService _userInfoService;
 
-	public ShoppingListController(ShoppingListDbContext db)
+	public ShoppingListController(ShoppingListDbContext db, UserInfoService userInfoService)
 	{
 		_db = db;
+		_userInfoService = userInfoService;
 	}
 
 	[HttpGet]
-	[Authorize]
 	public async Task<ActionResult<IEnumerable<ShoppingListDTO>>> GetShoppingLists()
 	{
+		string userGuid = _userInfoService.GetUserGuid(HttpContext.User);
 		return await _db.ShoppingLists
 			.Include(x => x.Products)
+			.Where(x => x.UserGuid == userGuid)
 			.Select(shoppingList => new ShoppingListDTO
 			{
 				Id = shoppingList.Id,
@@ -43,6 +48,9 @@ public class ShoppingListController : ControllerBase
 			.Include(x => x.Products).FirstOrDefaultAsync(x => x.Id == id);
 		if (shoppingList == null) return NotFound();
 
+		string userGuid = _userInfoService.GetUserGuid(HttpContext.User);
+		if (shoppingList.UserGuid != userGuid) return Unauthorized();
+
 		var shoppingListDto = new ShoppingListDTO
 		{
 			Id = shoppingList.Id,
@@ -58,12 +66,14 @@ public class ShoppingListController : ControllerBase
 	}
 
 	[HttpPost]
-	public async Task<IActionResult> Create(ShoppingListDTO shoppingListDto)
+	public async Task<IActionResult> Create(string listName)
 	{
+		string loggedUserGuid = _userInfoService.GetUserGuid(HttpContext.User);
 		await _db.ShoppingLists.AddAsync(new Models.ShoppingList
 		{
 			Id = 0,
-			Name = shoppingListDto.Name,
+			UserGuid = loggedUserGuid,
+			Name = listName,
 			Products = new List<Product>()
 		});
 

@@ -8,13 +8,14 @@ import SignInPage from './Pages/SignInPage';
 import SignUpPage from './Pages/SingUpPage';
 import ProtectedRoute from './Components/ProtectedRoute/ProtectedRoute';
 import ErrorPage from './Pages/ErrorPage';
+import HomePage from './Pages/HomePage';
 
 function App() {
 
   const router = createBrowserRouter([
     {
       path: '/',
-      element: <ProtectedRoute child={<h1>hi</h1>}/>,
+      element: <ProtectedRoute child={<HomePage/>}/>,
       errorElement: <ErrorPage/>
     },
     {

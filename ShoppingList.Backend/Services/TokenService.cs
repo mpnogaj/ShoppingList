@@ -43,12 +43,12 @@ public class TokenService
 		try
 		{
 			var claims = new List<Claim>
-			{
+			{	
+				new(ClaimTypes.NameIdentifier, user.Id),
+				new(ClaimTypes.Name, user.UserName ?? throw new NullReferenceException(nameof(user.UserName))),
 				new(JwtRegisteredClaimNames.Sub, "TokenForShoppingListApp"),
 				new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-				new(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString(CultureInfo.InvariantCulture)),
-				new(ClaimTypes.NameIdentifier, user.Id),
-				new(ClaimTypes.Name, user.UserName ?? throw new ArgumentException())
+				new(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString(CultureInfo.InvariantCulture))
 			};
 			return claims;
 		}
