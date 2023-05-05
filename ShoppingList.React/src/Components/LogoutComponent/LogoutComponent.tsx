@@ -1,6 +1,6 @@
 import React from "react";
 import axios from "axios";
-import { NavComponent, NavComponentProps, navHOC } from "../NavComponent/NavComponen";
+import { NavComponent, NavComponentProps, navHOC } from "../HOC/NavComponent/NavComponen";
 import { GetUserEndpoint, LogoutEndpoint } from "../../Endpoints";
 import { Button, Row } from "react-bootstrap";
 import UserDTO from "../../DTO/UserDTO";

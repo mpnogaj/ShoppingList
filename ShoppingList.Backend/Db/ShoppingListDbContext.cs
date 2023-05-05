@@ -15,7 +15,7 @@ public class ShoppingListDbContext : DbContext
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
 		modelBuilder.Entity<Models.ShoppingList>()
-			.HasMany(e => e.Products)
-			.WithMany(e => e.ShoppingLists);
+			.HasMany(e => e.Products);
+		//.WithMany(e => e.ShoppingLists);
 	}
 }

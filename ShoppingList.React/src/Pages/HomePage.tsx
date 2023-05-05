@@ -11,7 +11,6 @@ class HomePage extends React.Component {
         <LogoutComponent />
         <AppHeaderComponent />
         <ListsPresenterComponent />
-
       </Col>
     );
   }

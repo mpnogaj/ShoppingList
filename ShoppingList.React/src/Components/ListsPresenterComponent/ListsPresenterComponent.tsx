@@ -5,14 +5,15 @@ import React from "react";
 import ListRowComponent from "../ListRowComponent/ListRowComponent";
 import { nanoid } from "nanoid";
 import { Button, Col } from "react-bootstrap";
+import { NavComponent, NavComponentProps, navHOC } from "../HOC/NavComponent/NavComponen";
 
 interface ICompState {
   lists: Array<ListDTO> | null,
   error: boolean
 }
 
-class ListsPresenterComponent extends React.Component<{}, ICompState> {
-  constructor(props: {}) {
+class ListsPresenterComponent extends NavComponent<{}, ICompState> {
+  constructor(props: NavComponentProps<{}>) {
     super(props);
 
     this.state = {
@@ -45,7 +46,7 @@ class ListsPresenterComponent extends React.Component<{}, ICompState> {
       <ol>
         {this.state.lists.map((val, ind) => {
           return <ListRowComponent key={nanoid()} list={val}
-            onDeleteList={this.deleteList}  />
+            onDeleteList={this.deleteList} onViewList={this.viewList}/>
         })}
       </ol>
     )
@@ -85,6 +86,10 @@ class ListsPresenterComponent extends React.Component<{}, ICompState> {
     }
   }
 
+  viewList = (list: ListDTO) => {
+    this.props.navigate(`/view/${list.id}`);
+  }
+
   deleteList = async (list: ListDTO) => {
     try {
       console.assert(this.state.lists !== null);
@@ -108,4 +113,4 @@ class ListsPresenterComponent extends React.Component<{}, ICompState> {
   }
 }
 
-export default ListsPresenterComponent;
+export default navHOC(ListsPresenterComponent);

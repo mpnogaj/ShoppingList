@@ -33,20 +33,16 @@ public class ShoppingListController : ControllerBase
 			{
 				Id = shoppingList.Id,
 				Name = shoppingList.Name,
-				Products = shoppingList.Products.Select(product => new ProductDTO
-				{
-					Id = product.Id,
-					Name = product.Name
-				}).ToList()
+				Products = shoppingList.Products.Select(product => product.Name).ToList()
 			}).ToListAsync();
 	}
 
-	[HttpGet("{id:int}")]
-	public async Task<ActionResult<ShoppingListDTO>> GetShoppingList(int id)
+	[HttpGet("{listId:int}")]
+	public async Task<ActionResult<ShoppingListDTO>> GetShoppingList(int listId)
 	{
 		var shoppingList = await _db.ShoppingLists
 			.Include(x => x.Products)
-			.FirstOrDefaultAsync(x => x.Id == id);
+			.FirstOrDefaultAsync(x => x.Id == listId);
 		if (shoppingList == null) return NotFound();
 
 		string userGuid = _userInfoService.GetUserGuid(HttpContext.User);
@@ -56,11 +52,7 @@ public class ShoppingListController : ControllerBase
 		{
 			Id = shoppingList.Id,
 			Name = shoppingList.Name,
-			Products = shoppingList.Products.Select(x => new ProductDTO
-			{
-				Id = x.Id,
-				Name = x.Name
-			}).ToList()
+			Products = shoppingList.Products.Select(x => x.Name).ToList()
 		};
 
 		return shoppingListDto;
@@ -94,23 +86,18 @@ public class ShoppingListController : ControllerBase
 
 		var productsOnList = new List<Product>();
 
-		//add and update products
-		foreach (var productDto in shoppingListDto.Products)
+		//add new products
+		foreach (string productDto in shoppingListDto.Products)
 		{
-			var product = await _db.Products.FirstOrDefaultAsync(x => x.Id == productDto.Id);
+			var product = await _db.Products.FirstOrDefaultAsync(x => x.Name == productDto);
 			if (product == null)
 			{
 				product = new Product
 				{
 					Id = 0,
-					Name = productDto.Name,
-					ShoppingLists = new List<Models.ShoppingList>()
+					Name = productDto,
 				};
 				await _db.Products.AddAsync(product);
-			}
-			else
-			{
-				product.Name = productDto.Name;
 			}
 
 			productsOnList.Add(product);
@@ -120,7 +107,8 @@ public class ShoppingListController : ControllerBase
 
 		shoppingList.Name = shoppingListDto.Name;
 		shoppingList.Products.Clear();
-		foreach (var product in productsOnList) shoppingList.Products.Add(product);
+		foreach (var product in productsOnList) 
+			shoppingList.Products.Add(product);
 		await _db.SaveChangesAsync();
 
 		return Ok();

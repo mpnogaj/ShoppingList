@@ -9,14 +9,19 @@ import SignUpPage from './Pages/SingUpPage';
 import ProtectedRoute from './Components/ProtectedRoute/ProtectedRoute';
 import ErrorPage from './Pages/ErrorPage';
 import HomePage from './Pages/HomePage';
+import ViewListPage from './Pages/ViewListPage';
 
 function App() {
 
   const router = createBrowserRouter([
     {
       path: '/',
-      element: <ProtectedRoute child={<HomePage/>}/>,
-      errorElement: <ErrorPage/>
+      element: <ProtectedRoute child={<HomePage />} />,
+      errorElement: <ErrorPage />
+    },
+    {
+      path: '/view/:listId',
+      element: <ProtectedRoute child={<ViewListPage />} />
     },
     {
       path: '/SignIn',
@@ -29,9 +34,9 @@ function App() {
   ]);
 
   return (
-      <Container fluid>
-        <RouterProvider router={router} />
-      </Container>
+    <Container fluid>
+      <RouterProvider router={router} />
+    </Container>
   );
 }
 

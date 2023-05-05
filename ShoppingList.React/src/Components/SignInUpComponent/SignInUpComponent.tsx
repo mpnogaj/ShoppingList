@@ -2,7 +2,7 @@ import React from "react";
 import { Button, Col, Form, FormControl, FormFloating, Row } from "react-bootstrap";
 import axios, { AxiosError } from 'axios';
 import { AuthenticateEndpoint, RegisterEndpoint } from "../../Endpoints";
-import { NavComponent, NavComponentProps, navHOC } from "../NavComponent/NavComponen";
+import { NavComponent, NavComponentProps, navHOC } from "../HOC/NavComponent/NavComponen";
 import AppHeaderComponent from "../AppHeaderComponent/AppHeaderComponent";
 
 interface ICompState {
